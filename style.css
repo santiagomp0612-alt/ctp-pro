@@ -218,6 +218,19 @@ select { text-overflow: ellipsis; }
 .vacio-icono { font-size: 2.5rem; line-height: 1; }
 
 .panel-datos { display: grid; gap: 12px; }
+
+/* "Apoyá el proyecto" */
+.apoyo { display: grid; gap: 12px; }
+.apoyo > p { color: var(--texto-suave); font-size: .95rem; }
+.sinpe { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--superficie-2); border: 1px dashed var(--borde); border-radius: var(--radio-sm); padding: 12px 14px; }
+.sinpe-numero { font-size: 1.6rem; font-weight: 850; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.sinpe-titular { font-size: .85rem; color: var(--texto-suave); }
+.apoyo-nota { font-size: .85rem !important; }
+.patrocinador { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 14px; border-radius: var(--radio-sm); border: 1px solid var(--borde); background: var(--superficie-2); color: inherit; text-decoration: none; }
+.patro-logo { width: 48px; height: 48px; object-fit: contain; border-radius: 10px; flex: none; }
+.patro-texto { display: grid; min-width: 0; overflow-wrap: anywhere; }
+.patro-etiqueta { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); }
+.patro-mensaje { font-size: .88rem; color: var(--texto-suave); }
 .panel-datos p { color: var(--texto-suave); font-size: .93rem; }
 .botones-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .botones-datos .btn:last-child { grid-column: 1 / -1; }

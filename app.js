@@ -384,6 +384,93 @@ function htmlTarjetaMateria(materia) {
     </li>`;
 }
 
+/* "Apoyá el proyecto": SINPE Móvil y patrocinador (se configuran en config.js).
+   Si no hay número de SINPE ni patrocinador, no se muestra nada. */
+function soloDigitos(texto) {
+  return String(texto || '').replace(/\D/g, '');
+}
+
+// "88887777" → "8888-7777"
+function formatoTelefono(numero) {
+  const d = soloDigitos(numero);
+  return d.length === 8 ? `${d.slice(0, 4)}-${d.slice(4)}` : d;
+}
+
+// Solo aceptamos enlaces seguros (https://…, como los de WhatsApp https://wa.me/…); lo demás se ignora
+function enlaceSeguro(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' ? u.href : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function htmlPatrocinador() {
+  const p = CONFIG.apoyo && CONFIG.apoyo.patrocinador;
+  if (!p || !p.nombre) return '';
+  const enlace = enlaceSeguro(p.enlace);
+  // El logo solo puede ser un archivo del propio proyecto (sin "//" ni "http")
+  const logo = p.logo && !/^[a-z]+:|\/\//i.test(p.logo)
+    ? `<img class="patro-logo" src="${escapar(p.logo)}" alt="" width="48" height="48" loading="lazy">` : '';
+  const contenido = `
+    ${logo}
+    <span class="patro-texto">
+      <span class="patro-etiqueta">Con el apoyo de</span>
+      <strong>${escapar(p.nombre)}</strong>
+      ${p.mensaje ? `<span class="patro-mensaje">${escapar(p.mensaje)}</span>` : ''}
+    </span>`;
+  // rel="sponsored noopener noreferrer": la otra página no sabe de dónde vino el estudiante
+  return enlace
+    ? `<a class="patrocinador" href="${escapar(enlace)}" target="_blank" rel="sponsored noopener noreferrer">${contenido}</a>`
+    : `<div class="patrocinador">${contenido}</div>`;
+}
+
+function htmlApoyo() {
+  const sinpe = CONFIG.apoyo && CONFIG.apoyo.sinpe;
+  const numero = sinpe ? soloDigitos(sinpe.numero) : '';
+  const patro = htmlPatrocinador();
+  if (numero.length !== 8 && !patro) return '';
+
+  const bloqueSinpe = numero.length === 8 ? `
+    <p>CTP Pro es gratis y siempre lo va a ser. Si te ayudó a salvar una nota, podés apoyar con lo que querás por <strong>SINPE Móvil</strong>:</p>
+    <div class="sinpe">
+      <div>
+        <p class="sinpe-numero">${formatoTelefono(numero)}</p>
+        ${sinpe.titular ? `<p class="sinpe-titular">A nombre de ${escapar(sinpe.titular)}</p>` : ''}
+      </div>
+      <button class="btn chico" type="button" data-accion="copiar-sinpe" data-numero="${numero}">Copiar número</button>
+    </div>
+    <p class="apoyo-nota">Totalmente voluntario: la app funciona igual, apoyés o no. 💛</p>` : '';
+
+  return `
+    <section class="panel apoyo" aria-labelledby="titulo-apoyo">
+      <h2 id="titulo-apoyo">Apoyá el proyecto</h2>
+      ${bloqueSinpe}
+      ${patro}
+    </section>`;
+}
+
+// Copia un texto al portapapeles (con plan B para celulares viejos)
+async function copiarTexto(texto) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    return true;
+  } catch (e) {
+    const campo = document.createElement('textarea');
+    campo.value = texto;
+    campo.setAttribute('readonly', '');
+    campo.style.position = 'fixed';
+    campo.style.opacity = '0';
+    document.body.appendChild(campo);
+    campo.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+    campo.remove();
+    return ok;
+  }
+}
+
 function vistaInicio() {
   const hayMaterias = datos.materias.length > 0;
   const avisoGuardado = almacenamientoDisponible ? '' : `
@@ -408,6 +495,8 @@ function vistaInicio() {
       ${lista}
       <button class="btn primario ancho" type="button" data-accion="nueva-materia">+ Agregar materia</button>
       ${hayMaterias ? '<a class="btn acento ancho" href="#/simulador">🎯 ¿Qué nota necesito?</a>' : ''}
+
+      ${htmlApoyo()}
 
       <section class="panel panel-datos" aria-labelledby="titulo-datos">
         <h2 id="titulo-datos">Tus datos</h2>
@@ -1109,6 +1198,12 @@ document.addEventListener('click', async (e) => {
       guardar();
       pintarResultado();
       break;
+
+    case 'copiar-sinpe': {
+      const ok = await copiarTexto(boton.dataset.numero);
+      avisar(ok ? 'Número copiado. ¡Gracias por apoyar! 💛' : `Anotá el número: ${formatoTelefono(boton.dataset.numero)}`);
+      break;
+    }
 
     case 'exportar': exportarDatos(); break;
     case 'importar': $('#archivo-importar').click(); break;

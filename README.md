@@ -31,6 +31,16 @@ Abrí `config.js` y cambiá los números de `componentes` (tienen que sumar 100)
 Cuánto vale cada periodo en la nota del año está en `periodos` (ejemplo: 50/50).
 Si el colegio usa trimestres, se ponen 3 periodos ahí.
 
+## Apoyá el proyecto (SINPE y patrocinador)
+
+En `config.js`, sección `apoyo`:
+- `sinpe.numero`: el número de SINPE Móvil (8 dígitos). Mientras esté vacío, la sección no aparece.
+- `sinpe.titular`: opcional, el nombre que sale al hacer el SINPE.
+- `patrocinador`: nombre, mensaje, enlace (`https://…`) y logo (un archivo dentro del proyecto, nunca
+  una imagen de otra página, para que nadie pueda rastrear a los estudiantes).
+
+⚠️ Todo lo que pongás ahí queda público en internet.
+
 ## Correr las pruebas
 
 Con [Node.js](https://nodejs.org) instalado, desde esta carpeta:
@@ -50,6 +60,6 @@ Abrir `index.html` con doble clic también funciona, pero sin el modo sin intern
 
 ## Después de publicar un cambio
 
-Abrí `index.html` y cambiá todos los `2.1` por el número nuevo (ej. `2.2`) con "Buscar y reemplazar".
-Eso incluye los `?v=2.1` de los archivos y el número del pie de página. Con internet, la app siempre
+Abrí `index.html` y subí el número de versión con "Buscar y reemplazar" (ej. si dice `2.2`, cambialo a `2.3`).
+Eso incluye los `?v=` de los archivos y el número del pie de página. Con internet, la app siempre
 carga la versión más nueva, y en el pie de página podés ver qué versión tiene cada celular.

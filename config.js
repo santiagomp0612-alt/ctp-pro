@@ -47,6 +47,25 @@ const CONFIG = {
     'Programación', 'Contabilidad', 'Educación Cívica',
   ],
 
+  // "Apoyá el proyecto": SINPE Móvil y patrocinador.
+  // Mientras "numero" esté vacío (''), la sección NO aparece en la app.
+  // ⚠️ Lo que pongás aquí se publica en internet: cualquiera lo puede ver.
+  apoyo: {
+    sinpe: {
+      numero: '',     // ej. '88887777' (solo números, 8 dígitos)
+      titular: '',    // opcional: a nombre de quién sale en el SINPE, ej. 'María Pérez'
+    },
+    // Patrocinador (opcional). Mientras "nombre" esté vacío, no aparece.
+    // El logo tiene que ser un archivo DENTRO del proyecto (ej. 'patrocinador.png'),
+    // nunca una imagen de otra página: así nadie puede rastrear a los estudiantes.
+    patrocinador: {
+      nombre: '',     // ej. 'Librería El Estudiante'
+      mensaje: '',    // ej. 'Fotocopias e impresiones a 2 cuadras del colegio'
+      enlace: '',     // opcional: su página o WhatsApp, ej. 'https://wa.me/50688887777'
+      logo: '',       // opcional: ej. 'patrocinador.png'
+    },
+  },
+
   // Nombre de la "gaveta" de localStorage donde se guardan los datos.
   // Si algún día cambia la estructura de los datos, se puede subir a -v2.
   claveAlmacenamiento: 'ctp-pro-datos-v1',
