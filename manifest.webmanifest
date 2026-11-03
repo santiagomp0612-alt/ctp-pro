@@ -1,0 +1,16 @@
+{
+  "name": "CTP Pro",
+  "short_name": "CTP Pro",
+  "description": "Calculá tu promedio trimestral y qué nota necesitás para llegar al 70.",
+  "lang": "es-CR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b2559",
+  "theme_color": "#0b2559",
+  "icons": [
+    { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icono.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

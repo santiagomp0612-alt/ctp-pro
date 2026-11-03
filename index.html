@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es-CR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CTP Pro · Calculá tu promedio</title>
+  <meta name="description" content="Calculá tu promedio trimestral por materia y averiguá qué nota necesitás para llegar al 70. Gratis y tus datos se quedan en tu celular.">
+  <!-- Colores de la barra del navegador en el celular (claro / oscuro) -->
+  <meta name="theme-color" content="#0b2559" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#06102a" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icono-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Enlace oculto para quienes navegan con teclado o lector de pantalla -->
+  <a class="saltar" href="#app">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="contenedor cabecera-fila">
+      <a href="#/" class="logo" aria-label="CTP Pro, ir al inicio">
+        <span class="logo-marca" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" rx="9" fill="currentColor"/><path d="M8 22v-5M14 22V12M20 22v-8" stroke="#0b2559" stroke-width="3.2" stroke-linecap="round"/><circle cx="24.5" cy="9" r="2.6" fill="#0b2559"/></svg>
+        </span>
+        <span>CTP <b>Pro</b></span>
+      </a>
+      <span class="cabecera-nota">Meta: 70</span>
+    </div>
+  </header>
+
+  <!-- Aquí app.js dibuja la pantalla actual (Inicio, Materia o Simulador) -->
+  <main id="app" class="contenedor" tabindex="-1">
+    <noscript><p class="aviso">CTP Pro necesita JavaScript activado para funcionar.</p></noscript>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <p>Hecho por Santiago Muñoz Pérez, estudiante de CTP · Tus datos se quedan en tu celular</p>
+    </div>
+  </footer>
+
+  <!-- Ventana emergente reutilizable (para crear, renombrar, confirmar…) -->
+  <dialog id="dialogo" aria-labelledby="dialogo-titulo"></dialog>
+
+  <!-- Mensajito temporal ("Nota agregada", etc.) -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Orden importa: primero la configuración, luego los cálculos y al final la app -->
+  <script src="config.js"></script>
+  <script src="calculos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
