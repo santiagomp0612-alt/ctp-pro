@@ -90,6 +90,7 @@ main.contenedor { flex: 1; padding-top: 20px; padding-bottom: 32px; outline: non
 .cabecera-nota { font-size: .85rem; font-weight: 700; background: rgb(255 255 255 / .12); padding: 4px 10px; border-radius: 999px; }
 
 /* ---------- Pie ---------- */
+.pie-version { font-size: .75rem; margin-top: 4px; opacity: .8; }
 .pie { padding: 20px 0 calc(24px + env(safe-area-inset-bottom)); color: var(--texto-suave); font-size: .85rem; text-align: center; border-top: 1px solid var(--borde); }
 
 /* ---------- Botones ---------- */

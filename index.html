@@ -12,7 +12,10 @@
   <link rel="icon" href="icono.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icono-192.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css">
+  <!-- ¿Publicaste un cambio? Cambiá TODOS los "?v=2.1" de este archivo (y el número del pie)
+       por el número nuevo, ej. 2.2. Así el navegador sabe que tiene que bajar los archivos nuevos.
+       Truco: en el editor usá "Buscar y reemplazar" de 2.1 a 2.2. -->
+  <link rel="stylesheet" href="style.css?v=2.1">
 </head>
 <body>
   <!-- Enlace oculto para quienes navegan con teclado o lector de pantalla -->
@@ -38,6 +41,7 @@
   <footer class="pie">
     <div class="contenedor">
       <p>Hecho por Santiago Muñoz Pérez, estudiante de CTP · Tus datos se quedan en tu celular</p>
+      <p class="pie-version">Versión 2.1</p>
     </div>
   </footer>
 
@@ -48,8 +52,8 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <!-- Orden importa: primero la configuración, luego los cálculos y al final la app -->
-  <script src="config.js"></script>
-  <script src="calculos.js"></script>
-  <script src="app.js"></script>
+  <script src="config.js?v=2.1"></script>
+  <script src="calculos.js?v=2.1"></script>
+  <script src="app.js?v=2.1"></script>
 </body>
 </html>

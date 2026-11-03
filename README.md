@@ -50,5 +50,6 @@ Abrir `index.html` con doble clic también funciona, pero sin el modo sin intern
 
 ## Después de publicar un cambio
 
-Abrí `sw.js` y subí la versión (`ctp-pro-v1` → `ctp-pro-v2`). Los celulares que ya tenían la app
-reciben la versión nueva la segunda vez que la abren.
+Abrí `index.html` y cambiá todos los `2.1` por el número nuevo (ej. `2.2`) con "Buscar y reemplazar".
+Eso incluye los `?v=2.1` de los archivos y el número del pie de página. Con internet, la app siempre
+carga la versión más nueva, y en el pie de página podés ver qué versión tiene cada celular.
