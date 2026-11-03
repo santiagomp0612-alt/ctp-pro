@@ -3,7 +3,7 @@
    ---------------------------------------------------------------------
    AQUÍ están todos los valores por defecto de la app, en un solo lugar.
    Si el colegio confirma la tabla oficial de porcentajes, solo hay que
-   cambiar los números de "componentes" y listo.
+   cambiar los números de "componentes" (y de "periodos") y listo.
    ===================================================================== */
 
 const CONFIG = {
@@ -27,6 +27,15 @@ const CONFIG = {
     { clave: 'tareas', nombre: 'Tareas', peso: 10 },
     { clave: 'pruebas', nombre: 'Pruebas', peso: 40 },
     { clave: 'asistencia', nombre: 'Asistencia/Concepto', peso: 15 },
+  ],
+
+  // Periodos del año lectivo y cuánto vale cada uno en la NOTA ANUAL.
+  // ⚠️ 50/50 es un EJEMPLO: confirmar con el colegio cómo se calcula la nota del año.
+  // El estudiante puede cambiar estos porcentajes dentro de la app (pestaña "Año").
+  // Si un colegio usa trimestres, basta con poner 3 periodos aquí.
+  periodos: [
+    { nombre: 'I Periodo', peso: 50 },
+    { nombre: 'II Periodo', peso: 50 },
   ],
 
   // Componente que el simulador elige de primero (suele ser la próxima prueba).

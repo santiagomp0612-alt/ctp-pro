@@ -23,7 +23,7 @@ function revisar(nombre, obtenido, esperado) {
   console.log(`${ok ? '✅' : '❌'} ${nombre}\n     obtenido: ${mostrar(obtenido)}   esperado: ${mostrar(esperado)}`);
 }
 
-/* Crea una materia de prueba. notas = { cotidiano: [..], tareas: [..], ... } */
+/* Crea UN PERIODO de prueba (con sus 4 componentes). notas = { cotidiano: [..], tareas: [..], ... } */
 function materia(notas, pesos = {}) {
   return {
     id: 'm', nombre: 'Prueba',
@@ -42,16 +42,16 @@ revisar('Los porcentajes de ejemplo suman 100',
 
 const completa = materia({ cotidiano: [80, 90], tareas: [100], pruebas: [70, 60], asistencia: [100] });
 // 85×0,35 + 100×0,10 + 65×0,40 + 100×0,15 = 29,75 + 10 + 26 + 15 = 80,75
-revisar('Promedio trimestral completo (85, 100, 65, 100)', C.promedioMateria(completa).promedio, 80.75);
-revisar('…y no es parcial', C.promedioMateria(completa).parcial, false);
+revisar('Promedio del periodo completo (85, 100, 65, 100)', C.promedioPeriodo(completa).promedio, 80.75);
+revisar('…y no es parcial', C.promedioPeriodo(completa).parcial, false);
 
 const parcial = materia({ cotidiano: [90], pruebas: [80] });
 // (90×35 + 80×40) / 75 = 84,666…
-revisar('Promedio PARCIAL (solo Cotidiano 90 y Pruebas 80)', C.promedioMateria(parcial).promedio, 6350 / 75);
-revisar('…marca que es parcial', C.promedioMateria(parcial).parcial, true);
-revisar('…con 75% evaluado', C.promedioMateria(parcial).pesoEvaluado, 75);
+revisar('Promedio PARCIAL (solo Cotidiano 90 y Pruebas 80)', C.promedioPeriodo(parcial).promedio, 6350 / 75);
+revisar('…marca que es parcial', C.promedioPeriodo(parcial).parcial, true);
+revisar('…con 75% evaluado', C.promedioPeriodo(parcial).pesoEvaluado, 75);
 
-revisar('Materia sin ninguna nota → sin promedio (null)', C.promedioMateria(materia({})).promedio, null);
+revisar('Materia sin ninguna nota → sin promedio (null)', C.promedioPeriodo(materia({})).promedio, null);
 
 revisar('Pesos por nota (preparado para el futuro): 90×2 + 60×1 → 80',
   C.promedioComponente({ notas: [{ valor: 90, peso: 2 }, { valor: 60, peso: 1 }] }), 80);
@@ -120,6 +120,40 @@ const conCien = C.conNotasHipoteticas(dificil, [{ compId: 'pruebas', valor: 100,
 revisar('Notas hipotéticas NO modifican la materia real', dificil.componentes[2].notas.length, 2);
 revisar('…pero sí la copia', conCien.componentes[2].notas.length, 3);
 
+console.log('\n── Nota anual (2 periodos) ────────────────────────');
+const P50 = [50, 50];
+const anual = (p1, p2) => ({ periodos: [p1, p2] });
+const p1en80 = materia({ cotidiano: [80], tareas: [80], pruebas: [80], asistencia: [80] });
+const p2en60 = materia({ cotidiano: [60], tareas: [60], pruebas: [60], asistencia: [60] });
+revisar('I Periodo 80 y II Periodo 60 con 50/50 → anual 70', C.promedioAnual(anual(p1en80, p2en60), P50).promedio, 70);
+revisar('…no es parcial', C.promedioAnual(anual(p1en80, p2en60), P50).parcial, false);
+revisar('Con pesos 40/60 → 80×0,4 + 60×0,6 = 68', C.promedioAnual(anual(p1en80, p2en60), [40, 60]).promedio, 68);
+revisar('Solo I Periodo con notas → anual parcial = 80', C.promedioAnual(anual(p1en80, materia({})), P50).promedio, 80);
+revisar('…y marca que falta el II Periodo', C.promedioAnual(anual(p1en80, materia({})), P50).periodosSinNotas.join(), '1');
+revisar('Sin notas en ningún periodo → null', C.promedioAnual(anual(materia({}), materia({})), P50).promedio, null);
+
+revisar('I Periodo en 80 → para aprobar el año basta 60 en el II', C.metaDelPeriodoParaAnual(anual(p1en80, materia({})), 1, P50, 70), 60);
+const p1en50 = materia({ cotidiano: [50], tareas: [50], pruebas: [50], asistencia: [50] });
+revisar('I Periodo en 50 → necesita 90 de promedio en el II', C.metaDelPeriodoParaAnual(anual(p1en50, materia({})), 1, P50, 70), 90);
+const p1en30 = materia({ cotidiano: [30], tareas: [30], pruebas: [30], asistencia: [30] });
+revisar('I Periodo en 30 → necesitaría 110 (no alcanza el año)', C.metaDelPeriodoParaAnual(anual(p1en30, materia({})), 1, P50, 70), 110);
+const p1en100 = materia({ cotidiano: [100], tareas: [100], pruebas: [100], asistencia: [100] });
+revisar('I Periodo en 100 con 50/50 → meta del II = 40', C.metaDelPeriodoParaAnual(anual(p1en100, materia({})), 1, P50, 70), 40);
+revisar('Sin notas en el otro periodo → meta = 70', C.metaDelPeriodoParaAnual(anual(materia({}), materia({})), 0, P50, 70), 70);
+revisar('Periodo que vale 0% → null', C.metaDelPeriodoParaAnual(anual(p1en80, materia({})), 1, [100, 0], 70), null);
+revisar('Anual si el II termina en 60 (I en 80) → 70', C.anualConPromedioDePeriodo(anual(p1en80, materia({})), 1, P50, 60), 70);
+
+// Simulador con meta anual: I Periodo en 50 → II necesita 90; con todo en 90 menos Pruebas…
+const p2 = materia({ cotidiano: [90], tareas: [90], asistencia: [90], pruebas: [] });
+const meta = C.metaDelPeriodoParaAnual(anual(p1en50, p2), 1, P50, 70);
+r = C.notaNecesaria(p2, 'pruebas', 1, { ...OPC, notaMinima: meta });
+revisar('Simulador meta anual: necesita 90 en Pruebas del II Periodo', r.nota, 90);
+revisar('…y con eso el año queda en 70', C.anualConPromedioDePeriodo(anual(p1en50, p2), 1, P50, r.finalConNota), 70);
+r = C.notaNecesaria(p2, 'pruebas', 1, { ...OPC, notaMinima: C.metaDelPeriodoParaAnual(anual(p1en30, p2), 1, P50, 70) });
+revisar('Simulador meta anual imposible (meta 110)', r.estado, 'imposible');
+r = C.notaNecesaria(p2, 'pruebas', 1, { ...OPC, notaMinima: C.metaDelPeriodoParaAnual(anual(p1en100, materia({ cotidiano: [100], tareas: [100], asistencia: [100] })), 1, P50, 70) });
+revisar('Simulador meta anual asegurada (I en 100, II casi todo en 100)', r.estado, 'asegurado');
+
 console.log('\n── Prueba masiva: 20 000 materias al azar ─────────');
 // Para cada caso "posible" revisamos dos cosas:
 // 1) con la nota recomendada SÍ se llega al 70
@@ -136,7 +170,7 @@ for (let i = 0; i < 20000; i++) {
   const k = 1 + Math.floor(Math.random() * 4);
   const dec = Math.random() < 0.5 ? 0 : 1;
   const res = C.notaNecesaria(m, comp, k, { ...OPC, decimales: dec });
-  const finalCon = (x) => C.promedioMateria(C.conNotasHipoteticas(m, [{ compId: comp, valor: x, cantidad: k }])).promedio;
+  const finalCon = (x) => C.promedioPeriodo(C.conNotasHipoteticas(m, [{ compId: comp, valor: x, cantidad: k }])).promedio;
   if (res.estado === 'posible') {
     const paso = dec === 0 ? 1 : 0.1;
     if (finalCon(res.nota) < 70 - 1e-9) errores++;

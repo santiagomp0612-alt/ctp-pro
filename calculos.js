@@ -9,12 +9,17 @@
    Forma de los datos de una materia:
    {
      id: 'abc', nombre: 'Matemática',
-     componentes: [
-       { id, clave: 'pruebas', nombre: 'Pruebas', peso: 40,
-         notas: [ { id, valor: 85, peso: 1 }, ... ] },
+     periodos: [                       ← I Periodo, II Periodo…
+       { componentes: [
+           { id, clave: 'pruebas', nombre: 'Pruebas', peso: 40,
+             notas: [ { id, valor: 85, peso: 1 }, ... ] },
+           ...
+       ] },
        ...
      ]
    }
+   La mayoría de funciones trabajan con UN periodo (cualquier objeto que
+   tenga "componentes"). Las funciones "Anual" trabajan con la materia entera.
    ===================================================================== */
 
 /* Evita errores de "decimales fantasma" de JavaScript
@@ -52,27 +57,32 @@ function promedioComponente(componente) {
   return pesos > 0 ? suma / pesos : null;
 }
 
-/* Suma de los porcentajes de todos los componentes (debería dar 100). */
-function sumaPorcentajes(materia) {
-  return limpiarDecimales(materia.componentes.reduce((total, c) => total + c.peso, 0));
+/* Suma de los porcentajes de todos los componentes de un periodo (debería dar 100). */
+function sumaPorcentajes(periodo) {
+  return limpiarDecimales(periodo.componentes.reduce((total, c) => total + c.peso, 0));
 }
 
-function porcentajesValidos(materia) {
-  return Math.abs(sumaPorcentajes(materia) - 100) < 1e-9;
+function porcentajesValidos(periodo) {
+  return Math.abs(sumaPorcentajes(periodo) - 100) < 1e-9;
 }
 
-/* Promedio trimestral de una materia.
+/* Suma de una lista de pesos, ej. los de los periodos [50, 50] → 100 */
+function sumaLista(pesos) {
+  return limpiarDecimales(pesos.reduce((total, p) => total + p, 0));
+}
+
+/* Promedio de UN PERIODO de una materia.
    Fórmula: suma de (promedio del componente × su porcentaje).
    Si algún componente todavía no tiene notas, se calcula solo con lo
    evaluado hasta ahora (promedio PARCIAL) y se "reescala" a 100.
    Ejemplo: si solo hay Pruebas (40%) con 80 y Cotidiano (35%) con 90:
    (80×40 + 90×35) / 75 = 84,67 */
-function promedioMateria(materia) {
+function promedioPeriodo(periodo) {
   let puntos = 0;          // suma de promedio × peso
   let pesoEvaluado = 0;    // cuánto % ya tiene notas
   const sinNotas = [];     // componentes (con peso) que aún no tienen notas
 
-  for (const comp of materia.componentes) {
+  for (const comp of periodo.componentes) {
     const prom = promedioComponente(comp);
     if (prom === null) {
       if (comp.peso > 0) sinNotas.push(comp);
@@ -90,13 +100,76 @@ function promedioMateria(materia) {
   };
 }
 
-/* Crea una COPIA de la materia con notas imaginarias agregadas.
+/* NOTA ANUAL de una materia: promedio de los periodos según su peso.
+   pesos = [50, 50] (uno por periodo). Igual que con los componentes,
+   si un periodo todavía no tiene notas, se calcula con lo que hay
+   (nota anual PARCIAL). */
+function promedioAnual(materia, pesos) {
+  let puntos = 0;
+  let pesoEvaluado = 0;
+  const porPeriodo = [];
+  const periodosSinNotas = []; // índices de periodos sin notas
+
+  materia.periodos.forEach((periodo, i) => {
+    const r = promedioPeriodo(periodo);
+    porPeriodo.push(r);
+    const peso = pesos[i] || 0;
+    if (r.promedio === null) {
+      if (peso > 0) periodosSinNotas.push(i);
+      return;
+    }
+    puntos += r.promedio * peso;
+    pesoEvaluado += peso;
+  });
+
+  return {
+    promedio: pesoEvaluado > 0 ? puntos / pesoEvaluado : null,
+    // Es parcial si falta algún periodo o si algún periodo es parcial
+    parcial: periodosSinNotas.length > 0 || porPeriodo.some((r) => r.promedio !== null && r.parcial),
+    porPeriodo,
+    periodosSinNotas,
+  };
+}
+
+/* ¿Qué promedio necesito en el periodo "indice" para que la NOTA ANUAL
+   llegue a "notaMinima"? Despeje:
+     (puntosOtros + w × m) / (pesoOtros + w) = 70  →  m = (70 × (pesoOtros + w) − puntosOtros) / w
+   Devuelve null si ese periodo vale 0%. */
+function metaDelPeriodoParaAnual(materia, indice, pesos, notaMinima) {
+  const datosOtros = otrosPeriodos(materia, indice, pesos);
+  const w = pesos[indice] || 0;
+  if (!(w > 0)) return null;
+  return limpiarDecimales((notaMinima * (datosOtros.peso + w) - datosOtros.puntos) / w);
+}
+
+/* Nota anual que quedaría si el periodo "indice" termina con "promedio". */
+function anualConPromedioDePeriodo(materia, indice, pesos, promedio) {
+  const datosOtros = otrosPeriodos(materia, indice, pesos);
+  const w = pesos[indice] || 0;
+  return (datosOtros.puntos + promedio * w) / (datosOtros.peso + w);
+}
+
+// Ayudante: suma lo que aportan los periodos distintos de "indice" (solo los que tienen notas)
+function otrosPeriodos(materia, indice, pesos) {
+  let puntos = 0;
+  let peso = 0;
+  materia.periodos.forEach((periodo, i) => {
+    if (i === indice) return;
+    const r = promedioPeriodo(periodo);
+    if (r.promedio === null) return;
+    puntos += r.promedio * (pesos[i] || 0);
+    peso += pesos[i] || 0;
+  });
+  return { puntos, peso };
+}
+
+/* Crea una COPIA del periodo con notas imaginarias agregadas.
    Sirve para preguntar "¿y si saco X en tal componente?" sin tocar
    los datos reales. hipoteticas = [{ compId, valor, cantidad }] */
-function conNotasHipoteticas(materia, hipoteticas) {
+function conNotasHipoteticas(periodo, hipoteticas) {
   return {
-    ...materia,
-    componentes: materia.componentes.map((comp) => {
+    ...periodo,
+    componentes: periodo.componentes.map((comp) => {
       const extra = [];
       for (const h of hipoteticas) {
         if (h.compId !== comp.id) continue;
@@ -110,7 +183,8 @@ function conNotasHipoteticas(materia, hipoteticas) {
 /* ¿Qué nota necesito?
    Calcula la nota mínima que hay que sacar en CADA una de las
    "cantidad" evaluaciones que faltan del componente "compId"
-   para terminar con la nota mínima (70).
+   para que el PERIODO termine con opciones.notaMinima (normalmente 70;
+   si la meta es aprobar el año, la app pasa aquí el promedio que hace falta).
 
    Despeje de la fórmula (W = pesos evaluados, contando el componente elegido):
      final = (puntosOtros + pesoComp × (S + k·x) / (P + k)) / W ≥ 70
@@ -123,18 +197,18 @@ function conNotasHipoteticas(materia, hipoteticas) {
      'imposible'  → ni con 100 llega; "maximoAlcanzable" dice hasta dónde llega
      'sin-peso'   → el componente vale 0% y no cambia nada
 */
-function notaNecesaria(materia, compId, cantidad, opciones) {
+function notaNecesaria(periodo, compId, cantidad, opciones) {
   const minima = opciones.notaMinima;
   const maxima = opciones.notaMaxima;
   const decimales = opciones.decimales;
 
-  const objetivo = materia.componentes.find((c) => c.id === compId);
+  const objetivo = periodo.componentes.find((c) => c.id === compId);
   if (!objetivo || !(objetivo.peso > 0)) return { estado: 'sin-peso' };
 
   let puntosOtros = 0;
   let pesoOtros = 0;
   const ignorados = []; // otros componentes sin notas (no entran al cálculo)
-  for (const comp of materia.componentes) {
+  for (const comp of periodo.componentes) {
     if (comp.id === compId) continue;
     const prom = promedioComponente(comp);
     if (prom === null) {
@@ -177,7 +251,8 @@ function notaNecesaria(materia, compId, cantidad, opciones) {
 if (typeof module !== 'undefined') {
   module.exports = {
     limpiarDecimales, redondearArriba, truncar, promedioComponente,
-    sumaPorcentajes, porcentajesValidos, promedioMateria,
+    sumaPorcentajes, porcentajesValidos, sumaLista, promedioPeriodo,
+    promedioAnual, metaDelPeriodoParaAnual, anualConPromedioDePeriodo,
     conNotasHipoteticas, notaNecesaria,
   };
 }

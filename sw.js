@@ -11,7 +11,7 @@
    Si cambiás la lista de archivos, subí el número de versión (v2, v3…).
    ===================================================================== */
 
-const VERSION = 'ctp-pro-v1';
+const VERSION = 'ctp-pro-v2';
 const ARCHIVOS = [
   './',
   './index.html',

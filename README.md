@@ -1,7 +1,8 @@
 # CTP Pro
 
-Calculadora gratuita de promedio trimestral para estudiantes de CTP en Costa Rica.
-Simula qué nota necesitás en tu próxima evaluación para llegar al 70.
+Calculadora gratuita de notas para estudiantes de CTP en Costa Rica.
+Llevá tus notas del I y II Periodo, mirá tu nota del año y simulá qué nota necesitás
+en tu próxima evaluación para aprobar el periodo o el año (70).
 
 Hecho por Santiago Muñoz Pérez, estudiante de CTP · Tus datos se quedan en tu celular.
 
@@ -26,7 +27,9 @@ Hecho por Santiago Muñoz Pérez, estudiante de CTP · Tus datos se quedan en tu
 
 ## Cambiar los porcentajes oficiales
 
-Abrí `config.js` y cambiá los números de `componentes`. Tienen que sumar 100.
+Abrí `config.js` y cambiá los números de `componentes` (tienen que sumar 100).
+Cuánto vale cada periodo en la nota del año está en `periodos` (ejemplo: 50/50).
+Si el colegio usa trimestres, se ponen 3 periodos ahí.
 
 ## Correr las pruebas
 

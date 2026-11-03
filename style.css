@@ -197,6 +197,22 @@ select { text-overflow: ellipsis; }
 .estado-riesgo .barra span { background: var(--mal); }
 .barra i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--texto); border-radius: 2px; }
 
+.tm-desglose { font-size: .85rem; color: var(--texto-suave); font-variant-numeric: tabular-nums; }
+
+/* Vista del año: una fila por periodo */
+.periodos-anual { display: grid; gap: 10px; }
+.fila-periodo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--borde); padding-top: 10px; }
+.fila-periodo-ir {
+  flex: 1 1 170px; min-height: 52px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: var(--radio-sm); border: 2px solid var(--borde); border-left-width: 6px;
+  background: var(--superficie-2); color: var(--texto); font: inherit; font-weight: 700; cursor: pointer; text-align: left;
+}
+.fila-periodo-ir.estado-aprobando { border-left-color: var(--ok); }
+.fila-periodo-ir.estado-riesgo { border-left-color: var(--mal); }
+.fila-periodo-numero { font-size: 1.4rem; font-weight: 850; font-variant-numeric: tabular-nums; }
+.estado-aprobando .fila-periodo-numero { color: var(--ok); }
+.estado-riesgo .fila-periodo-numero { color: var(--mal); }
+
 .vacio { text-align: center; padding: 28px 16px; display: grid; gap: 8px; justify-items: center; }
 .vacio-icono { font-size: 2.5rem; line-height: 1; }
 
@@ -251,6 +267,8 @@ select { text-overflow: ellipsis; }
 
 .segmentado { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--superficie-2); border: 1px solid var(--borde); border-radius: var(--radio-sm); }
 .segmentado button { min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--texto-suave); font: inherit; font-weight: 700; cursor: pointer; }
+.pestanas { grid-template-columns: repeat(var(--columnas, 3), minmax(0, 1fr)); }
+.pestanas button { padding: 0 4px; font-size: .95rem; }
 .segmentado button[aria-pressed="true"] { background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); outline: 2px solid var(--primario); }
 
 .resultado { text-align: center; display: grid; gap: 10px; padding: 24px 16px; border-radius: var(--radio); border: 2px solid var(--borde); background: var(--superficie); }
